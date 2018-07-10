@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/johynpapin/noise/constants"
 	"time"
 )
 
@@ -21,5 +22,5 @@ func (t *Timer) Start() {
 }
 
 func (t *Timer) MicrosecondsPerPulse() time.Duration {
-	return time.Duration((60.0 * 1000000000.0) / (PPQN * t.tempo))
+	return time.Duration((60.0 * 1000000000.0) / (constants.PPQN * t.tempo))
 }

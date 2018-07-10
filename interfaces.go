@@ -1,7 +1,7 @@
 package main
 
 type Audible interface {
-	Next() []float32
+	Next() float64
 }
 
 type Mutable interface {
@@ -12,4 +12,9 @@ type Sequencable interface {
 	IsPlaying() bool
 	Play()
 	Stop()
+}
+
+type Playable interface {
+	PlayFrequency(float64)
+	StopFrequency(float64)
 }

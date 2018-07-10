@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/johynpapin/noise/stuff"
 	log "github.com/sirupsen/logrus"
 	"os"
 	"os/signal"
@@ -9,27 +10,29 @@ import (
 func main() {
 	log.Info("== NOISE Orchestrator Is Super Enjoyable ==")
 
-	stereoSine := NewStereoSine(256, 540, SAMPLE_RATE)
+	freq := stuff.NewFloat64Generator(220)
+	amp := stuff.NewFloat64Generator(1)
+	offset := stuff.NewFloat64Generator(1)
+
+	lg0 := stuff.NewLowGenSaw()
+
+	lg0.Freq.Attach(freq)
+	lg0.Amp.Attach(amp)
+	lg0.Offset.Attach(offset)
+
+	lg1 := stuff.NewLowGenTriangle()
+	lg2 := stuff.NewLowGenPulse()
+	lg3 := stuff.NewLowGenSaw()
+
 	track := NewTrack()
+
+	track.AddAudible(lg0)
+	track.AddAudible(lg1)
+	track.AddAudible(lg2)
+	track.AddAudible(lg3)
+
 	player := NewPlayer()
-
-	track.AddAudible(stereoSine)
 	player.AddTrack(track)
-
-	patternStr := "10001110010001000100010001000100010001000100010001000100010001000"
-	patternBool := make([]bool, len(patternStr))
-	for i, c := range patternStr {
-		if c == '1' {
-			patternBool[i] = true
-		}
-	}
-
-	pattern := NewPattern(patternBool)
-
-	timer := NewTimer(120.0)
-	sequencer := NewSequencer(timer, pattern)
-
-	sequencer.AddSequencable(stereoSine)
 
 	stop := make(chan bool)
 	c := make(chan os.Signal, 1)
@@ -40,8 +43,6 @@ func main() {
 		}
 	}()
 
-	go sequencer.Start()
-	go timer.Start()
 	player.Play()
 	log.Info("Playing...")
 

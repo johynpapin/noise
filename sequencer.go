@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/johynpapin/noise/constants"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -23,12 +24,12 @@ func (s *Sequencer) Start() {
 		case <-s.timer.Pulses:
 			ppqnCount++
 
-			if ppqnCount%(int(PPQN)/4) == 0 {
+			if ppqnCount%(int(constants.PPQN)/4) == 0 {
 				go s.nextBeat(beat)
 				beat++
 			}
 
-			if ppqnCount == (int(PPQN) * 4) {
+			if ppqnCount == (int(constants.PPQN) * 4) {
 				ppqnCount = 0
 				beat = 0
 			}

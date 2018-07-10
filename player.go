@@ -39,14 +39,14 @@ func (p *Player) Stop() error {
 
 func (p *Player) processAudio(out [][]float32) {
 	l := float32(len(p.tracks))
-	var tmp []float32
+	var tmp float32
 
 	for i := range out[0] {
 		out[0][i], out[1][i] = 0, 0
 		for t := range p.tracks {
-			tmp = p.tracks[t].Next()
-			out[0][i] += tmp[0] / l
-			out[1][i] += tmp[1] / l
+			tmp = float32(p.tracks[t].Next())
+			out[0][i] += tmp / l
+			out[1][i] += tmp / l
 		}
 	}
 }

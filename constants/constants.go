@@ -1,4 +1,4 @@
-package main
+package constants
 
 const PPQN = 24.0
 

@@ -4,15 +4,12 @@ type Track struct {
 	audibles []Audible
 }
 
-func (t *Track) Next() []float32 {
-	l := float32(len(t.audibles))
-	out := make([]float32, 2)
-	tmp := make([]float32, 2)
+func (t *Track) Next() float64 {
+	l := float64(len(t.audibles))
+	var out float64
 
 	for i := range t.audibles {
-		tmp = t.audibles[i].Next()
-		out[0] += tmp[0] / l
-		out[1] += tmp[1] / l
+		out += t.audibles[i].Next() / l
 	}
 
 	return out
