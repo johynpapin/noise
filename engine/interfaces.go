@@ -1,4 +1,4 @@
-package main
+package engine
 
 type Audible interface {
 	Next() float64
