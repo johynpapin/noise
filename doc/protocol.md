@@ -2,7 +2,7 @@
 
 ## Introduction
 
-This file details the commands that the protocol used between the server the web panel must support.
+This file details the commands that the protocol used between the server and the web panel must support.
 
 ## General commands
 
