@@ -9,16 +9,27 @@ const state = {
   socket: {
     isConnected: false
   },
-  selectedTrackIndex: null,
+  selectedTrackName: null,
   state: {
     tracks: []
   },
-  things: []
+  things: [],
+  midi: false
 }
 
 const getters = {
   selectedTrack: state => {
-    return state.selectedTrackIndex !== null ? state.state.tracks[state.selectedTrackIndex] : null
+    if (!state.selectedTrackName || !state.state.tracks) {
+      return null
+    }
+
+    for (let track of state.state.tracks) {
+      if (track.name === state.selectedTrackName) {
+        return track
+      }
+    }
+
+    return null
   }
 }
 

@@ -17,10 +17,10 @@ func NewLowGen() Thing {
 		IOS: NewIOS(),
 	}
 
-	t.IOS.inputs.add(t, "freq")
-	t.IOS.inputs.add(t, "amp")
-	t.IOS.inputs.add(t, "pw")
-	t.IOS.inputs.add(t, "offset")
+	t.IOS.inputs.add(t, "freq", 440)
+	t.IOS.inputs.add(t, "amp", 1)
+	t.IOS.inputs.add(t, "pw", 1)
+	t.IOS.inputs.add(t, "offset", 0)
 
 	t.IOS.outputs.add(t, "sine", NewLowGenSine(t))
 	t.IOS.outputs.add(t, "pulse", NewLowGenPulse(t))

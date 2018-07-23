@@ -18,9 +18,9 @@ func NewPolyBLEPGen() Thing {
 		NewIOS(),
 	}
 
-	t.IOS.inputs.add(t, "freq")
-	t.IOS.inputs.add(t, "amp")
-	t.IOS.inputs.add(t, "offset")
+	t.IOS.inputs.add(t, "freq", 440)
+	t.IOS.inputs.add(t, "amp", 1)
+	t.IOS.inputs.add(t, "offset", 0)
 
 	t.IOS.outputs.add(t, "sine", NewPolyBLEPSine(t))
 	t.IOS.outputs.add(t, "saw", NewPolyBLEPSaw(t))

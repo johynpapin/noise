@@ -8,10 +8,11 @@ import (
 	"github.com/rs/cors"
 	log "github.com/sirupsen/logrus"
 	"net/http"
+	"time"
 )
 
 // Serve launches an http server and a socket.io server. This makes the NOISE web panel work.
-func Serve(player *engine.Player) {
+func Serve(e *engine.Engine) {
 	mux := http.NewServeMux()
 
 	server, err := socketio.NewServer(nil)
@@ -21,7 +22,7 @@ func Serve(player *engine.Player) {
 	server.On("connection", func(so socketio.Socket) {
 		log.Info("A panel is now connected.")
 
-		state := generateState(player)
+		state := generateState(e)
 		stateMsg := stateMessage{*state}
 		answer, _ := json.Marshal(stateMsg)
 		so.Emit("state", string(answer))
@@ -29,6 +30,18 @@ func Serve(player *engine.Player) {
 		thingsMsg := thingsMessage{things.Kinds}
 		answer, _ = json.Marshal(thingsMsg)
 		so.Emit("things", string(answer))
+
+		ticker := time.NewTicker(10 * time.Millisecond)
+
+		go func() {
+			for _ = range ticker.C {
+				err := emitState(so, e)
+				if err != nil {
+					ticker.Stop()
+					return
+				}
+			}
+		}()
 
 		// General commands
 
@@ -40,7 +53,9 @@ func Serve(player *engine.Player) {
 				return
 			}
 
-			handleCreateTrackMessage(so, player, m)
+			log.WithField("message", m).Info("create track")
+
+			handleCreateTrackMessage(so, e, m)
 		})
 
 		so.On("deleteTrack", func(msg string) {
@@ -51,7 +66,7 @@ func Serve(player *engine.Player) {
 				return
 			}
 
-			handleDeleteTrackMessage(so, player, m)
+			handleDeleteTrackMessage(so, e, m)
 		})
 
 		so.On("createThing", func(msg string) {
@@ -62,7 +77,7 @@ func Serve(player *engine.Player) {
 				return
 			}
 
-			handleCreateThingMessage(so, player, m)
+			handleCreateThingMessage(so, e, m)
 		})
 
 		so.On("deleteThing", func(msg string) {
@@ -73,7 +88,7 @@ func Serve(player *engine.Player) {
 				return
 			}
 
-			handleDeleteThingMessage(so, player, m)
+			handleDeleteThingMessage(so, e, m)
 		})
 
 		so.On("attachToThing", func(msg string) {
@@ -84,7 +99,7 @@ func Serve(player *engine.Player) {
 				return
 			}
 
-			handleAttachToThingMessage(so, player, m)
+			handleAttachToThingMessage(so, e, m)
 		})
 
 		so.On("detachFromThing", func(msg string) {
@@ -95,7 +110,7 @@ func Serve(player *engine.Player) {
 				return
 			}
 
-			handleDetachFromThingMessage(so, player, m)
+			handleDetachFromThingMessage(so, e, m)
 		})
 
 		so.On("attachToTrack", func(msg string) {
@@ -106,7 +121,7 @@ func Serve(player *engine.Player) {
 				return
 			}
 
-			handleAttachToTrackMessage(so, player, m)
+			handleAttachToTrackMessage(so, e, m)
 		})
 
 		so.On("detachFromTrack", func(msg string) {
@@ -117,10 +132,10 @@ func Serve(player *engine.Player) {
 				return
 			}
 
-			handleDetachFromTrackMessage(so, player, m)
+			handleDetachFromTrackMessage(so, e, m)
 		})
 
-		so.On("updateSettingMessage", func(msg string) {
+		so.On("updateSetting", func(msg string) {
 			m := &updateSettingMessage{}
 			err := json.Unmarshal([]byte(msg), m)
 			if err != nil {
@@ -128,7 +143,7 @@ func Serve(player *engine.Player) {
 				return
 			}
 
-			handleUpdateSettingMessage(so, player, m)
+			handleUpdateSettingMessage(so, e, m)
 		})
 
 		// MIDI commands
@@ -141,7 +156,9 @@ func Serve(player *engine.Player) {
 				return
 			}
 
-			handleAttachToMIDIMessage(so, player, m)
+			log.WithField("msg", m).Info("attachToMIDI")
+
+			handleAttachToMIDIMessage(so, e, m)
 		})
 
 		so.On("detachFromMIDI", func(msg string) {
@@ -152,13 +169,27 @@ func Serve(player *engine.Player) {
 				return
 			}
 
-			handleDetachFromMIDIMessage(so, player, m)
+			handleDetachFromMIDIMessage(so, e, m)
+		})
+
+		// UI commands
+
+		so.On("updateThingsPosition", func(msg string) {
+			m := &updateThingsPositionMessage{}
+			err := json.Unmarshal([]byte(msg), m)
+			if err != nil {
+				log.WithField("error", err).Error("error reading message")
+				return
+			}
+
+			handleUpdateThingsPositionMessage(so, e, m)
 		})
 
 		so.On("disconnection", func() {
 			log.Println("A panel is now disconnected.")
 		})
 	})
+
 	server.On("error", func(so socketio.Socket, err error) {
 		log.Println("error:", err)
 	})

@@ -9,8 +9,8 @@ func (i *Inputs) Read(name string) float64 {
 	return input.Read()
 }
 
-func (i *Inputs) add(thing Thing, name string) {
-	i.Inputs[name] = newInput(name, thing)
+func (i *Inputs) add(thing Thing, name string, defaultValue float64) {
+	i.Inputs[name] = newInput(name, thing, defaultValue)
 }
 
 func (i *Inputs) Attach(inputName string, output *Output) {

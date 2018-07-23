@@ -7,7 +7,9 @@ export const SOCKET_DISCONNECT = (state, status) => {
 }
 
 export const SOCKET_STATE = (state, message) => {
-  state.state = JSON.parse(message).state
+  let newState = JSON.parse(message).state
+
+  state.state = newState
 }
 
 export const SOCKET_THINGS = (state, message) => {

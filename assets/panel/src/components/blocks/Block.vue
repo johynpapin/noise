@@ -1,13 +1,25 @@
 <template>
-  <div :style="{left: x + 'px', top: y + 'px'}" class="block">
-    <div class="inputs">
-      <div v-for="(input, index) in inputs" @mousedown="startLink($event, 'input', index, input.name)" @mouseup="stopLink($event, 'input', index, input.name)" class="circle"></div>
-    </div>
+  <div :style="{left: (dragging ? tx : x) + 'px', top: (dragging ? ty : y) + 'px'}" class="block">
     <div class="box">
-      <h1 class="title">{{name}}</h1>
-    </div>
-    <div class="outputs">
-      <div v-for="(output, index) in outputs" @mousedown="startLink($event, 'output', index, output.name)" @mouseup="stopLink($event, 'output', index, output.name)" class="circle"></div>
+      <div class="inputs">
+        <div v-for="(input, index) in inputs" :key="name + 'i' + input.name">
+          <span @mousedown="startLink($event, 'input', index, input.name)" @mouseup="stopLink($event, 'input', index, input.name)" class="tag">{{input.name}}</span>
+        </div>
+      </div>
+      <div class="block-content">
+        <h1 class="title">{{name}}</h1>
+        <div v-for="(setting, index) in settings" @click="clickSetting($event, setting, index)" class="field">
+          <label class="label">{{setting.name}}</label>
+          <div class="control">
+            <input class="input is-rounded" type="number" :value="setting.value" @input="updateSetting($event, setting, index)">
+          </div>
+        </div>
+      </div>
+      <div class="outputs">
+        <div v-for="(output, index) in outputs" :key="name + 'o' + output.name">
+          <span @mousedown="startLink($event, 'output', index, output.name)" @mouseup="stopLink($event, 'output', index, output.name)" class="tag">{{output.name}}</span>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -19,6 +31,7 @@ export default {
     x: Number,
     y: Number,
     name: String,
+    settings: Array,
     inputs: Array,
     outputs: Array
   },
@@ -28,6 +41,8 @@ export default {
       linking: false,
       lastMouseX: 0,
       lastMouseY: 0,
+      tx: 0,
+      ty: 0,
       height: 0,
       width: 0
     }
@@ -50,18 +65,25 @@ export default {
   methods: {
     mouseDown (e) {
       if (this.$el.contains(e.target)) {
-        if (!e.target.classList.contains('circle')) {
+        if (!e.target.classList.contains('tag')) {
           this.lastMouseX = e.pageX
           this.lastMouseY = e.pageY
+
+          this.tx = this.x
+          this.ty = this.y
 
           this.dragging = true
         }
       }
     },
     mouseUp (e) {
-      this.dragging = false
+      if (this.dragging) {
+        this.$emit('drop-block', this.tx, this.ty, this.height, this.width)
 
-      if (this.linking && !e.target.classList.contains('circle')) {
+        this.dragging = false
+      }
+
+      if (this.linking && !e.target.classList.contains('tag')) {
         this.$emit('stop-link', e, '', -1)
       }
 
@@ -74,7 +96,10 @@ export default {
         this.lastMouseX = e.pageX
         this.lastMouseY = e.pageY
 
-        this.$emit('mousemove', this.lastMouseX - lastMouseX, this.lastMouseY - lastMouseY, this.height, this.width)
+        this.tx += this.lastMouseX - lastMouseX
+        this.ty += this.lastMouseY - lastMouseY
+
+        this.$emit('mousemove', this.tx, this.ty, this.height, this.width)
       } else if (this.linking) {
         this.$emit('move-link', e)
       }
@@ -86,6 +111,12 @@ export default {
     stopLink (e, type, index, name) {
       this.linking = false
       this.$emit('stop-link', e, type, index, name)
+    },
+    updateSetting(e, setting, index) {
+      this.$emit('update-setting', setting.name, Number(e.target.value))
+    },
+    clickSetting(e, setting, index) {
+      this.$emit('click-setting', setting.name)
     }
   }
 }
@@ -98,31 +129,44 @@ export default {
 
 .box {
   margin-bottom: 0;
+  display: flex;
+  padding: 0;
+}
+
+.box .block-content {
+  padding: 0 .25rem;
 }
 
 .inputs {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  left: -7px;
+  transform: translateX(-50%);
+  display: -ms-flexbox;
+  display: -webkit-flex;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
 
 .outputs {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  right: -7px;
+  transform: translateX(50%);
+  display: -ms-flexbox;
+  display: -webkit-flex;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
 
-.circle {
-  margin-top: 10px;
-  margin-bottom: 10px;
+.inputs > div, .outputs > div {
+  margin-top: 1px;
+  margin-bottom: 1px;
+}
 
-  position: relative;
-  width: 14px;
-  height: 14px;
-  border-radius: 7px;
-  background: linear-gradient(to bottom, #40b3ff, #09f);
+.block {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 }
 
 .circle:hover {

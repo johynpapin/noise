@@ -13,6 +13,8 @@ func NewFloat64Gen() Thing {
 		IOS: NewIOS(),
 	}
 
+	t.IOS.settings.add(t, "value")
+
 	t.IOS.outputs.add(t, "output", NewFloat64GenOutput(t))
 
 	return t
@@ -31,5 +33,5 @@ func NewFloat64GenOutput(t *Float64Gen) *Float64GenOutput {
 }
 
 func (o Float64GenOutput) Next() float64 {
-	return o.t.settings.GetFloat64("value")
+	return o.t.settings.Get("value")
 }

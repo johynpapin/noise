@@ -19,7 +19,7 @@ func NewPlayer() *Player {
 	}
 }
 
-func (p *Player) Play() error {
+func (p *Player) Start() error {
 	err := portaudio.Initialize()
 	if err != nil {
 		return err

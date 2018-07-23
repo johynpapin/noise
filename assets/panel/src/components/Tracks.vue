@@ -10,7 +10,12 @@
           <span>Add a track</span>
         </button>
       </div>
-      <track-item @click.native="selectTrack(index)" v-for="(track, index) in tracks" :key="track.name" :name="track.name" :selected="index === selectedTrackIndex"></track-item>
+      <track-item @click.native="selectTrack(track.name)" v-for="(track, index) in tracks" :key="track.name" :name="track.name" :selected="track.name === selectedTrackName"></track-item>
+      <div class="panel-block">
+        <button class="button is-primary is-fullwidth" @click="editMIDI">
+          <span>Edit MIDI</span>
+        </button>
+      </div>
     </nav>
     <div class="modal" :class="[{'is-active': addModalActive}]">
       <div class="modal-background" @click="closeAddModal"></div>
@@ -50,7 +55,7 @@ export default {
   },
   computed: mapState({
     tracks: state => state.state.tracks,
-    selectedTrackIndex: state => state.selectedTrackIndex
+    selectedTrackName: state => state.selectedTrackName
   }),
   methods: {
     openAddModal () {
@@ -62,10 +67,13 @@ export default {
     },
     addTrack () {
       this.closeAddModal()
-      this.$socket.emit('addTrack', JSON.stringify({name: this.trackName}))
+      this.$socket.emit('createTrack', JSON.stringify({name: this.trackName}))
     },
-    selectTrack (trackIndex) {
-      this.$store.state.selectedTrackIndex = trackIndex
+    selectTrack (trackName) {
+      this.$store.state.selectedTrackName = trackName
+    },
+    editMIDI () {
+      this.$store.state.midi = true
     }
   },
   components: {

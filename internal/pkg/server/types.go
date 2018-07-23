@@ -56,10 +56,10 @@ type detachFromTrackMessage struct {
 }
 
 type updateSettingMessage struct {
-	TrackName string      `json:"trackName"`
-	ThingName string      `json:"thingName"`
-	Name      string      `json:"name"`
-	Value     interface{} `json:"value"`
+	TrackName string  `json:"trackName"`
+	ThingName string  `json:"thingName"`
+	Name      string  `json:"name"`
+	Value     float64 `json:"value"`
 }
 
 // MIDI commands
@@ -74,4 +74,13 @@ type detachFromMIDIMessage struct {
 	TrackName string `json:"trackName"`
 	ThingName string `json:"thingName"`
 	Name      string `json:"name"`
+}
+
+// UI commands
+
+type updateThingsPositionMessage struct {
+	TrackName string  `json:"trackName"`
+	Name      string  `json:"name"`
+	X         float64 `json:"x"`
+	Y         float64 `json:"y"`
 }

@@ -5,8 +5,8 @@
         <div class="container">
           <div class="columns">
             <div class="column">
-              <h1 class="title">{{track.name}}</h1>
-              <h2 class="subtitle">Such a perfect track</h2>
+                <h1 class="title">{{track.name}}</h1>
+                <h2 class="subtitle">Such a perfect track</h2>
             </div>
             <div class="column is-narrow">
               <add-thing-dropdown :track="track"></add-thing-dropdown>
@@ -15,7 +15,7 @@
         </div>
       </div>
     </section>
-    <blocks-container @new-link="newLink" :blocks="blocks"></blocks-container>
+    <blocks-container @drop-block="dropThing" @click-setting="clickSetting" @update-setting="updateSetting" @new-link="newLink" :raw-blocks="blocks"></blocks-container>
   </div>
 </template>
 
@@ -68,9 +68,21 @@ export default {
   methods: {
     newLink (link) {
       if (link.inputBlockName === 'Output') {
-        this.$socket.emit('updateTrack', JSON.stringify({track: this.track.name, line: 'emit ' + link.outputBlockName + ' ' + link.outputName}))
+        this.$socket.emit('attachToTrack', JSON.stringify({trackName: this.track.name, thingName: link.outputBlockName, name: link.outputName}))
       } else {
-        this.$socket.emit('updateTrack', JSON.stringify({track: this.track.name, line: 'attach ' + link.outputBlockName + ' ' + link.inputBlockName + ' ' + link.outputName + ' ' + link.inputName}))
+        this.$socket.emit('attachToThing', JSON.stringify({trackName: this.track.name, outputThingName: link.outputBlockName, inputThingName: link.inputBlockName, outputName: link.outputName, inputName: link.inputName}))
+      }
+    },
+    dropThing (thing) {
+      this.$socket.emit('updateThingsPosition', JSON.stringify({trackName: this.track.name, name: thing.name, x: thing.x, y: thing.y}))
+    },
+    updateSetting (setting) {
+      this.$socket.emit('updateSetting', JSON.stringify({trackName: this.track.name, thingName: setting.blockName, name: setting.name, value: setting.value}))
+    },
+    clickSetting (setting) {
+      if (this.$store.state.midi) {
+        this.$store.state.midi = false
+        this.$socket.emit('attachToMIDI', JSON.stringify({trackName: this.track.name, thingName: setting.blockName, name: setting.name}))
       }
     }
   },

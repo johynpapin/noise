@@ -66,7 +66,7 @@ export default {
       this.thingName = null
     },
     addThing () {
-      this.$socket.emit('updateTrack', JSON.stringify({track: this.track.name, line: 'thing ' + this.thingName + ' ' + this.thing}))
+      this.$socket.emit('createThing', JSON.stringify({trackName: this.track.name, name: this.thingName, kind: this.thing}))
       this.thing = null
       this.thingName = null
     }
