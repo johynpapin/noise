@@ -195,7 +195,7 @@ func Serve(e *engine.Engine) {
 	})
 
 	mux.Handle("/socket.io/", server)
-	mux.Handle("/", http.FileServer(http.Dir("./assets")))
+	mux.Handle("/", http.FileServer(http.Dir("./assets/panel/dist")))
 
 	c := cors.New(cors.Options{
 		AllowedOrigins:   []string{"*"},
