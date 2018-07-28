@@ -9,27 +9,53 @@ const state = {
   socket: {
     isConnected: false
   },
-  selectedTrackName: null,
+  selectedTrackID: null,
+  selectedInstrumentID: null,
+  selectedInstrumentPatchID: null,
   state: {
-    tracks: []
+    tracks: [],
+    instruments: [],
+    loops: []
   },
   things: [],
-  midi: false
+  MIDIEditMode: false
 }
 
 const getters = {
   selectedTrack: state => {
-    if (!state.selectedTrackName || !state.state.tracks) {
+    if (state.selectedTrackID === null || !state.state.tracks) {
       return null
     }
 
     for (let track of state.state.tracks) {
-      if (track.name === state.selectedTrackName) {
+      if (track.ID === state.selectedTrackID) {
         return track
       }
     }
 
     return null
+  },
+  selectedInstrument: state => {
+    if (state.selectedInstrumentID === null || !state.state.instruments) {
+      return null
+    }
+
+    for (let instrument of state.state.instruments) {
+      if (instrument.ID === state.selectedInstrumentID) {
+        return instrument
+      }
+    }
+  },
+  selectedInstrumentPatch: (state, getters) => {
+    if (state.selectedTrackID === null || !state.state.tracks || state.selectedInstrumentPatchID === null) {
+      return null
+    }
+
+    for (let patch of getters.selectedTrack.instrumentPatchs) {
+      if (patch.ID === state.selectedInstrumentPatchID) {
+        return patch
+      }
+    }
   }
 }
 

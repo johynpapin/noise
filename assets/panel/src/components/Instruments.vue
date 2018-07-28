@@ -1,31 +1,31 @@
 <template>
-  <div id="tracks">
+  <div id="instruments">
     <nav class="panel">
-      <p class="panel-heading">Tracks</p>
+      <p class="panel-heading">Instruments</p>
       <div class="panel-block">
         <button class="button is-primary is-fullwidth" @click="openModal">
           <span class="icon">
             <fa icon="plus"></fa>
           </span>
-          <span>Create a track</span>
+          <span>Create an instrument</span>
         </button>
       </div>
-      <track-item @click.native="selectTrack(track.ID)" v-for="(track, index) in tracks" :key="track.ID" :name="track.name" :selected="track.ID === selectedTrackID"></track-item>
+      <instrument-item @click.native="selectInstrument(instrument.ID)" v-for="(instrument, index) in instruments" :key="instrument.ID" :name="instrument.name" :selected="instrument.ID === selectedInstrumentID"></instrument-item>
     </nav>
     <div class="modal" :class="[{'is-active': modalActive}]">
       <div class="modal-background" @click="closeModal"></div>
       <div class="modal-content">
         <div class="box">
-          <h1 class="title">Create a track</h1>
-          <form @submit="createTrack">
+          <h1 class="title">Create an instrument</h1>
+          <form @submit="createInstrument">
             <div class="field">
-              <label class="label">Track name</label>
+              <label class="label">Instrument name</label>
               <div class="control">
-                <input class="input" type="text" v-model="trackName" placeholder="Track name">
+                <input class="input" type="text" v-model="instrumentName" placeholder="Instrument name">
               </div>
             </div>
             <div class="control">
-              <button class="button is-primary">Add track</button>
+              <button class="button is-primary">Create instrument</button>
             </div>
           </form>
         </div>
@@ -38,40 +38,40 @@
 <script>
 import { mapState } from 'vuex'
 
-import TrackItem from './TrackItem.vue'
+import InstrumentItem from './InstrumentItem.vue'
 
 export default {
   name: 'Tracks',
   data () {
     return {
       modalActive: false,
-      trackName: ''
+      instrumentName: ''
     }
   },
   computed: mapState({
-    tracks: state => state.state.tracks,
-    selectedTrackID: state => state.selectedTrackID
+    instruments: state => state.state.instruments,
+    selectedInstrumentID: state => state.selectedInstrumentID
   }),
   methods: {
     openModal () {
-      this.trackName = ''
+      this.instrumentName = ''
       this.modalActive = true
     },
     closeModal () {
       this.modalActive = false
     },
-    createTrack () {
+    createInstrument () {
       this.closeModal()
-      this.$socket.emit('command', JSON.stringify({command: 'createTrack', name: this.trackName}))
+      this.$socket.emit('command', JSON.stringify({command: 'createInstrument', name: this.instrumentName}))
     },
-    selectTrack (trackID) {
+    selectInstrument (instrumentID) {
       this.$store.state.selectedInstrumentPatchID = null
-      this.$store.state.selectedTrackID = trackID
-      this.$store.state.selectedInstrumentID = null
+      this.$store.state.selectedInstrumentID = instrumentID
+      this.$store.state.selectedTrackID = null
     },
   },
   components: {
-    TrackItem
+    InstrumentItem
   }
 }
 </script>

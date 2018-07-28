@@ -17,11 +17,11 @@
         </div>
       </div>
     </div>
-    <div class="modal" :class="[{'is-active': thing !== null}]">
+    <div class="modal" :class="[{'is-active': thingKind !== null}]">
       <div class="modal-background" @click="closeAddThingModal"></div>
       <div class="modal-content">
         <div class="box">
-          <h1 class="title" style="color: #000;">Add a <strong>{{thing}}</strong></h1>
+          <h1 class="title" style="color: #000;">Add a <strong>{{thingKind}}</strong></h1>
           <form @submit="addThing">
             <div class="field">
               <label class="label">Thing name</label>
@@ -46,11 +46,11 @@ import { mapState } from 'vuex'
 export default {
   name: 'AddThingDropdown',
   props: {
-    track: Object
+    instrument: Object
   },
   data () {
     return {
-      thing: null,
+      thingKind: null,
       thingName: null
     }
   },
@@ -58,16 +58,16 @@ export default {
     things: state => state.things
   }),
   methods: {
-    openAddThingModal (thing) {
-      this.thing = thing
+    openAddThingModal (thingKind) {
+      this.thingKind = thingKind
     },
     closeAddThingModal () {
-      this.thing = null
+      this.thingKind = null
       this.thingName = null
     },
     addThing () {
-      this.$socket.emit('createThing', JSON.stringify({trackName: this.track.name, name: this.thingName, kind: this.thing}))
-      this.thing = null
+      this.$socket.emit('command', JSON.stringify({command: 'createThing', instrumentID: this.instrument.ID, name: this.thingName, kind: this.thingKind}))
+      this.thingKind = null
       this.thingName = null
     }
   }

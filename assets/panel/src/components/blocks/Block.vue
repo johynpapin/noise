@@ -2,22 +2,29 @@
   <div :style="{left: (dragging ? tx : x) + 'px', top: (dragging ? ty : y) + 'px'}" class="block">
     <div class="box">
       <div class="inputs">
-        <div v-for="(input, index) in inputs" :key="name + 'i' + input.name">
-          <span @mousedown="startLink($event, 'input', index, input.name)" @mouseup="stopLink($event, 'input', index, input.name)" class="tag">{{input.name}}</span>
+        <div v-for="(input, index) in inputs" :key="input.ID">
+          <span @mousedown="startLink($event, 'input', input, index)" @mouseup="stopLink($event, 'input', input, index)" class="tag">{{input.name}}</span>
         </div>
       </div>
       <div class="block-content">
         <h1 class="title">{{name}}</h1>
-        <div v-for="(setting, index) in settings" @click="clickSetting($event, setting, index)" class="field">
-          <label class="label">{{setting.name}}</label>
-          <div class="control">
-            <input class="input is-rounded" type="number" :value="setting.value" @input="updateSetting($event, setting, index)">
+        <div v-for="(setting, index) in settings" @click="clickSetting($event, setting, index)" class="field is-grouped is-grouped-centered">
+          <div v-if="setting.exposedName !== ''" class="control is-expanded">
+            <input type="number" class="input is-small" :value="setting.min" @input="updateSetting($event, 'min', setting, index)">
           </div>
+          <div v-if="setting.exposedName === ''" class="control is-expanded">
+            <input type="number" class="input is-small" min="0" max="127" :value="setting.value" @input="updateSetting($event, 'value', setting, index)">
+          </div>
+          <div v-if="setting.exposedName !== ''" class="control is-expanded">
+            <input type="number" class="input is-small" :value="setting.max" @input="updateSetting($event, 'max', setting, index)">
+          </div>
+          <button v-if="setting.exposedName === ''" class="button is-small" @click="exposeSetting(setting)">Expose</button>
+          <button v-else class="button is-small" @click="hideSetting(setting)">Hide</button>
         </div>
       </div>
       <div class="outputs">
-        <div v-for="(output, index) in outputs" :key="name + 'o' + output.name">
-          <span @mousedown="startLink($event, 'output', index, output.name)" @mouseup="stopLink($event, 'output', index, output.name)" class="tag">{{output.name}}</span>
+        <div v-for="(output, index) in outputs" :key="output.ID">
+          <span @mousedown="startLink($event, 'output', output, index)" @mouseup="stopLink($event, 'output', output, index)" class="tag">{{output.name}}</span>
         </div>
       </div>
     </div>
@@ -84,7 +91,7 @@ export default {
       }
 
       if (this.linking && !e.target.classList.contains('tag')) {
-        this.$emit('stop-link', e, '', -1)
+        this.$emit('stop-link', e, '', null, -1)
       }
 
       this.linking = false
@@ -104,19 +111,26 @@ export default {
         this.$emit('move-link', e)
       }
     },
-    startLink (e, type, index, name) {
+    startLink (e, type, elem, index) {
       this.linking = true
-      this.$emit('start-link', e, type, index, name)
+      this.$emit('start-link', e, type, elem, index)
     },
-    stopLink (e, type, index, name) {
+    stopLink (e, type, elem, index) {
       this.linking = false
-      this.$emit('stop-link', e, type, index, name)
+      this.$emit('stop-link', e, type, elem, index)
     },
-    updateSetting(e, setting, index) {
-      this.$emit('update-setting', setting.name, Number(e.target.value))
+    updateSetting(e, kind, setting, index) {
+      setting[kind] = Number(e.target.value)
+      this.$emit('update-setting', setting)
     },
     clickSetting(e, setting, index) {
-      this.$emit('click-setting', setting.name)
+      this.$emit('click-setting', setting)
+    },
+    exposeSetting(setting) {
+      this.$emit('expose-setting', setting)
+    },
+    hideSetting(setting) {
+      this.$emit('hide-setting', setting)
     }
   }
 }
@@ -135,6 +149,11 @@ export default {
 
 .box .block-content {
   padding: 0 .25rem;
+  text-align: center;
+}
+
+.block-content input {
+  max-width: 55px;
 }
 
 .inputs {

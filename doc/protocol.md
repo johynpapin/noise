@@ -6,17 +6,24 @@ This file details the commands that the protocol used between the server and the
 
 ## General commands
 
-- [x] Create a `Track`
-- [ ] Delete a `Track`
-- [x] Create a `Thing`
-- [ ] Delete a `Thing`
-- [x] Attach two `Thing`s
-- [x] Detach two `Thing`s
-- [x] Attach an `Output` to a `Track`
-- [ ] Detach an `Output` from a `Track`
-- [x] Update a setting
+- Create a `Track`
+- Update a `Track`
+- Delete a `Track`
+- Create an `Instrument`
+- Update an `Instrument`
+- Delete an `Instrument`
+- Create a `Thing`
+- Update a `Thing`
+- Delete a `Thing`
+- Attach two `Thing`s
+- Detach two `Thing`s
+- Attach an `Input` to an `Instrument` entry point
+- Detach an `Input` from an `Instrument` entry point
+- Attach an `Output` to an `Instrument` exit point
+- Detach an `Output` from an `Instrument` exit point
+- Update a setting
 
 ## MIDI commands
 
-- [ ] Put a setting in MIDI edit mode
-- [ ] Detach a setting from a MIDI controller
+- Put a setting in MIDI edit mode
+- Detach a setting from a MIDI controller

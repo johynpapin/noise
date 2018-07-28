@@ -1,8 +1,9 @@
 package main
 
 import (
-	"github.com/johynpapin/noise/internal/pkg/engine"
-	"github.com/johynpapin/noise/internal/pkg/server"
+	"github.com/johynpapin/noise/runtime"
+	"github.com/johynpapin/noise/server"
+	"github.com/johynpapin/noise/store"
 	"github.com/rakyll/portmidi"
 	log "github.com/sirupsen/logrus"
 	"os"
@@ -21,23 +22,26 @@ func main() {
 		}
 	}()
 
-	e := engine.NewEngine()
-	err := e.Start()
+	store := store.NewStore()
+
+	r := runtime.NewRuntime(store)
+	err := r.Start()
 	if err != nil {
 		log.WithError(err).Fatal("fatal error")
 	}
 
 	log.Info("list of midi devices:")
-	for _, device := range e.MidiManager.GetDevices() {
+	for i, device := range r.MidiManager.GetDevices() {
 		log.WithField("device", device).Info("midi device:")
+		if i > 1 && device.IsInputAvailable {
+			r.MidiManager.ConnectToDevice(portmidi.DeviceID(i))
+		}
 	}
 
-	e.MidiManager.ConnectToDevice(portmidi.DeviceID(3))
-
-	go server.Serve(e)
+	go server.Serve(r)
 
 	<-stop
-	e.Player.Stop()
+	r.Player.Stop()
 
 	log.Info("Good bye!")
 }
